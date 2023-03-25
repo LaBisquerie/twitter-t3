@@ -7,8 +7,9 @@ import { api, RouterOutputs } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime"
 import Image from "next/image";
-import { LoadingPage } from "~/components/loading";
+import { LoadingPage, LoadingSpinner } from "~/components/loading";
 import { useState } from "react";
+import {toast} from 'react-hot-toast'
 
 dayjs.extend(relativeTime);
 
@@ -20,9 +21,17 @@ const CreatePostWizard = () => {
   const ctx = api.useContext();
 
   const {mutate, isLoading: isPosting} = api.posts.create.useMutation({
-    onSuccess: () => {
+    onSuccess: () => { 
       setInput("");
       ctx.posts.getAll.invalidate(); // Refetch data when post is updated or created
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage && errorMessage[0]) {
+        toast.error(errorMessage[0]);
+      } else {
+        toast.error("Failed to post! Please try again later.");
+      }
     }
   });
 
@@ -31,8 +40,15 @@ const CreatePostWizard = () => {
   return (
     <div className="flex gap-3 w-full">
       <Image src={user.profileImageUrl} alt="Profile image" className="h-14 w-14 rounded-full" width={56} height={56} />
-      <input placeholder="Type some text!" className="grow bg-transparent outline-none" type='text' onChange={(e) => setInput(e.target.value)} value={input} disabled={isPosting}/>
-      <button onClick={() => mutate({content: input})}>Post</button>
+      <input placeholder="Type some text!" className="grow bg-transparent outline-none" type='text' onChange={(e) => setInput(e.target.value)} value={input} onKeyDown={(e) => {if(e.key === "Enter"){e.preventDefault(); if (input !== "") {mutate({content: input})}}}} disabled={isPosting}/>
+      {input !== "" && !isPosting && (
+        <button onClick={() => mutate({content: input})}>Post</button>
+      )}
+      {isPosting && (
+        <div className="flex justify-center items-center">
+          <LoadingSpinner size={20} />
+        </div>
+      )}
     </div>
   )
 }
