@@ -8,12 +8,7 @@
 const config = {
   reactStrictMode: true,
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.clerk.dev'
-      }
-    ]
+    domains: ["images.clerk.dev"],
   },
 
   /**
