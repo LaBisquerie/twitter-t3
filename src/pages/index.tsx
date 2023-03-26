@@ -18,7 +18,7 @@ const CreatePostWizard = () => {
   const {mutate, isLoading: isPosting} = api.posts.create.useMutation({
     onSuccess: () => { 
       setInput("");
-      ctx.posts.getAll.invalidate(); // Refetch data when post is updated or created
+      void ctx.posts.getAll.invalidate(); // Refetch data when post is updated or created
     },
     onError: (e) => {
       const errorMessage = e.data?.zodError?.fieldErrors.content;
