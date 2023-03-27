@@ -11,7 +11,7 @@ const SinglePostPage: NextPage<{id: string}> = ({id}) => {
     id
   });
 
-  if (!data) return <div>Error 404</div>  
+  if (!data) return <div>404</div>  
 
   return (
     <>
